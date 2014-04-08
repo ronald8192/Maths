@@ -3,9 +3,10 @@ import java.util.Scanner;
 public class RSA {
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
-		//Menu
+		// Menu
 		int select = 0;
-		//Gen RSA key
+		boolean sysCall = false;
+		// Gen RSA key
 		int prime1 = 0;
 		int prime2 = 0;
 		int pmax = 0; // max(prime1,prime2)
@@ -13,25 +14,26 @@ public class RSA {
 		int TN = 0; // Euler Totient function
 		int e = 0; // random interger, e>p1,p2
 		int d = 0; // modular inverse of (e % N)
-		
-		//Encrypt
-		
-		//Decrypt
-		
-		
-		
+
+		// Encrypt
+		String selectKey = "";
+		int text = 0;
+		double textEncrypted = 0L;
+		// Decrypt
+
 		menu();
 		do {
-			System.out.print("RSA>");
-			select = input.nextInt();
+			if (!sysCall) {
+				System.out.print("RSA>");
+				select = input.nextInt();
+			}
 
-			
 			switch (select) {
 			case 0:
 				menu();
 				break;
 			case 1:
-				//RSA keygen
+				// RSA keygen
 				do {
 					System.out.print("Enter prime number 1: ");
 					prime1 = input.nextInt();
@@ -47,41 +49,62 @@ public class RSA {
 					System.out.print("e: (Enter 0 for random e)");
 					e = input.nextInt();
 					if (e == 0) {
+						// random gen e
 						do {
 							e = (int) (Math.random() * 999999) + pmax;
 						} while (mathsGCD(e, TN) != 1);
 						break;
 					} else if (mathsGCD(e, TN) != 1) {
+						// user e, not co-prime
 						System.out.println(e + "is not co-prime to" + TN);
+						continue;
+					} else {
+						// user e, co-prime
+						break;
 					}
-				} while (mathsGCD(e, TN) != 1);
+				} while (true);
 				d = mathsModInverse(e, TN);
 				// print key
-				System.out.println("Public key (e,N): ");
+				System.out.print("Public key (e,N):  ");
 				System.out.println("(" + e + "," + N + ")");
-				System.out.println("Private key (d,N): ");
+				System.out.print("Private key (d,N): ");
 				System.out.println("(" + d + "," + N + ")");
-				
+
 				break;
 			case 2:
-				//Encrypt
-				
+				// Encrypt
+				do {
+					System.out.print("Use public key (" + e + "," + N + ") ? (y,n)");
+					selectKey = input.next();
+				} while (selectKey == "y" || selectKey == "n");
+				if (selectKey == "n" && prime1 == 0) {
+					// no RSA key, call keygen
+					System.out.println("Calling keygen...");
+					select = 1;
+					break;
+				} else {
+					// use generated key
+					// start encrypt
+					System.out.print("Text to encrypt: ");
+					text = input.nextInt();
+					textEncrypted = Math.pow(text, e) % N;
+					System.out.println("Encrypted text: " + textEncrypted);
+				}
 				break;
 			case 3:
-				//Decrypt
-				
+				// Decrypt
+
 				break;
 			case 9:
 				break;
 			default:
-				System.out.println("-RSA: " + select +": Command not found");
+				System.out.println("-RSA: " + select + ": Command not found");
 				break;
 			}
-			
-			
-		} while (select!=9);
+
+		} while (select != 9);
 		System.out.println("Bye!");
-		
+
 	}
 
 	private static void menu() {
@@ -93,7 +116,7 @@ public class RSA {
 		System.out.println("\n9. Exit");
 		System.out.println("=======MENU=======");
 	}
-	
+
 	private static boolean isPrime(int num) {
 		int numD3 = 0;
 
