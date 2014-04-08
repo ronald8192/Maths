@@ -15,13 +15,13 @@ public class RSA {
 		int e = 0; // random interger, e>p1,p2
 		int d = 0; // modular inverse of (e % N)
 
-		// Encrypt
+		// Encrypt,Decrypt
 		char selectKey = ' ';
 		int text = 0;
 		int textEncrypted = 0;
 		int custom_N = 0;
 		int custom_e = 0;
-		// Decrypt
+		int custom_d = 0;
 
 		menu();
 		do {
@@ -117,6 +117,43 @@ public class RSA {
 			case 3:
 				// Decrypt
 
+				
+				custom_d = 0;
+				custom_N = 0;
+				if (prime1 == 0) {
+					// no RSA key, call keygen
+					do {
+						System.out.print("Custom key / Generate new key ? (c,g): ");
+						selectKey = input.next().toLowerCase().charAt(0);
+					} while (!(selectKey == 'c' || selectKey == 'g'));
+				} else {
+					do {
+						System.out.print("Custom key / Existing key / Generate new key ? (c,e,g): ");
+						selectKey = input.next().toLowerCase().charAt(0);
+					} while (!(selectKey == 'c'|| selectKey == 'g' || selectKey == 'e'));
+				}
+				if (selectKey == 'c') {
+					// user input private key
+					System.out.println("Enter private key (d,N): ");
+					System.out.print("d: ");
+					custom_d = input.nextInt();
+					System.out.print("N: ");
+					custom_N = input.nextInt();
+				} else if (selectKey == 'e') {
+					custom_d = d;
+					custom_N = N;
+				} else {
+					// call keygen
+					sysCall = true;
+					select = 1;
+					break;
+				}
+				//Decrypt
+				System.out.print("Text to decrypt: ");
+				textEncrypted = input.nextInt();
+				text = (int)(Math.pow(textEncrypted, custom_d) % custom_N);
+				System.out.println("Origin text: " + text);
+				
 				break;
 			case 9:
 				break;
@@ -142,7 +179,7 @@ public class RSA {
 
 	private static boolean isPrime(int num) {
 		int numD3 = 0;
-
+		if(num == 2)return true;
 		if ((num & 1) == 0) {
 			System.out.println(num + " is not prime.");
 			return false;
