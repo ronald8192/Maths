@@ -16,9 +16,11 @@ public class RSA {
 		int d = 0; // modular inverse of (e % N)
 
 		// Encrypt
-		String selectKey = "";
+		char selectKey = ' ';
 		int text = 0;
-		double textEncrypted = 0L;
+		int textEncrypted = 0;
+		int custom_N = 0;
+		int custom_e = 0;
 		// Decrypt
 
 		menu();
@@ -27,6 +29,7 @@ public class RSA {
 				System.out.print("RSA>");
 				select = input.nextInt();
 			}
+			sysCall = false;
 
 			switch (select) {
 			case 0:
@@ -73,23 +76,43 @@ public class RSA {
 				break;
 			case 2:
 				// Encrypt
-				do {
-					System.out.print("Use public key (" + e + "," + N + ") ? (y,n)");
-					selectKey = input.next();
-				} while (selectKey == "y" || selectKey == "n");
-				if (selectKey == "n" && prime1 == 0) {
+				custom_e = 0;
+				custom_N = 0;
+				if (prime1 == 0) {
 					// no RSA key, call keygen
-					System.out.println("Calling keygen...");
+					do {
+						System.out.print("Custom key / Generate new key ? (c,g): ");
+						selectKey = input.next().toLowerCase().charAt(0);
+					} while (!(selectKey == 'c' || selectKey == 'g'));
+				} else {
+					do {
+						System.out.print("Custom key / Existing key / Generate new key ? (c,e,g): ");
+						selectKey = input.next().toLowerCase().charAt(0);
+					} while (!(selectKey == 'c'|| selectKey == 'g' || selectKey == 'e'));
+				}
+				if (selectKey == 'c') {
+					// user input public key
+					System.out.println("Enter public key (e,N): ");
+					System.out.print("e: ");
+					custom_e = input.nextInt();
+					System.out.print("N: ");
+					custom_N = input.nextInt();
+				} else if (selectKey == 'e') {
+					custom_e = e;
+					custom_N = N;
+				} else {
+					// call keygen
+					sysCall = true;
 					select = 1;
 					break;
-				} else {
-					// use generated key
-					// start encrypt
-					System.out.print("Text to encrypt: ");
-					text = input.nextInt();
-					textEncrypted = Math.pow(text, e) % N;
-					System.out.println("Encrypted text: " + textEncrypted);
 				}
+				
+				// start encrypt
+				System.out.print("Text to encrypt: ");
+				text = input.nextInt();
+				textEncrypted = (int)(Math.pow(text, custom_e) % custom_N);
+				System.out.println("Encrypted text: " + textEncrypted);
+
 				break;
 			case 3:
 				// Decrypt
